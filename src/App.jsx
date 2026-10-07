@@ -117,8 +117,12 @@ if (showConfirm) {
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       {/* HEADER */}
-      <Header />
-
+      <Header
+        onBack={() => {
+          setSubmitted(false);
+          setCurrentStep(2);
+        }}
+      />
       {/* MAIN CONTAINER */}
       <main className="mx-auto flex w-full max-w-[1240px] flex-col px-4 pb-12 pt-6 sm:px-8 sm:pt-8 lg:flex-row lg:gap-14 lg:px-12 lg:pt-14">
         {/* STEPPER */}
