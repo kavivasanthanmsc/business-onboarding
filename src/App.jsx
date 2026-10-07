@@ -11,7 +11,7 @@ import Success from "./components/Success";
 
 function App() {
   const [businessTitle, setBusinessTitle] = useState("");
-  const [description, setDescription] = useState("I've typed something here");
+  const [description, setDescription] = useState("");
   const [companyType, setCompanyType] = useState(
     "LLC / Partnership / Single-member"
   );
@@ -28,8 +28,45 @@ function App() {
   const [currentStep, setCurrentStep] = useState(2);
   const [submitted, setSubmitted] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [errors, setErrors] = useState({});
       // Continue =============== //
-  const handleContinue = () => {
+ const handleContinue = () => {
+  const newErrors = {};
+
+  if (!businessTitle.trim()) {
+    newErrors.businessTitle = "Business title is required";
+  }
+
+  if (!description.trim()) {
+    newErrors.description = "Description is required";
+  }
+
+  if (!address.country.trim()) {
+    newErrors.country = "Country is required";
+  }
+
+  if (!address.line1.trim()) {
+    newErrors.line1 = "Address is required";
+  }
+
+  if (!address.city.trim()) {
+    newErrors.city = "City is required";
+  }
+
+  if (!address.state.trim()) {
+    newErrors.state = "State is required";
+  }
+
+  if (!address.zipcode.trim()) {
+    newErrors.zipcode = "Zipcode is required";
+  }
+
+  setErrors(newErrors);
+
+  if (Object.keys(newErrors).length > 0) {
+    return;
+  }
+
   setShowConfirm(true);
 };
 
@@ -91,8 +128,8 @@ if (showConfirm) {
         <section className="min-w-0 w-full flex-1">
           <div className="mx-auto w-full max-w-[420px] sm:max-w-[620px] lg:mx-0 lg:max-w-[680px]">
             {/* TITLE */}
-            <h1 className="mb-6 text-xl font-semibold tracking-tight text-[#303c4a] sm:mb-8 sm:text-2xl">
-              About your business
+            <h1 className="mb-6 text-2xl font-bold tracking-tight text-[#303c4a] sm:mb-8 sm:text-3xl">
+               About your business
             </h1>
 
             {/* FORM FIELDS */}
@@ -103,28 +140,56 @@ if (showConfirm) {
                   type="text"
                   placeholder="Text input"
                   value={businessTitle}
-                  onChange={(e) => setBusinessTitle(e.target.value)}
-                  className="h-[40px] w-full rounded-md border border-gray-200 bg-white px-3 text-xs text-gray-700 outline-none focus:border-blue-500 sm:h-[42px] sm:rounded-lg sm:px-4 sm:text-sm"
-                />
-              </FormField>
+                  onChange={(e) => {
+                      setBusinessTitle(e.target.value);
+                
+                      if (e.target.value.trim()) {
+                        setErrors((prev) => ({
+                          ...prev,
+                          businessTitle: false,
+                        }));
+                      }
+                     }}
+                  className={`h-[40px] w-full rounded-md border bg-white px-3 text-xs font-medium text-gray-700 outline-none transition sm:h-[42px] sm:rounded-lg sm:px-4 sm:text-sm ${
+                        errors.businessTitle
+                          ? "border-red-400 focus:border-red-500 focus:ring-4 focus:ring-red-50"
+                          : "border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                      }`}                   
+                  />
+                  {errors.businessTitle && (
+                      <p className="mt-1.5 text-xs font-medium text-red-500">
+                        Business title is required
+                      </p>
+                  )}
+              </FormField> 
 
               {/* Description */}
               <FormField
                 label={
                   <>
                     Description of
-                    <br className="hidden sm:block" />
+                    <br className="hidden sm:block " />
                     business conducted
                   </>
                 }
                 description="Helpful description"
               >
                 <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
-                  className="min-h-[76px] w-full resize-none rounded-md border border-gray-200 bg-white px-3 py-2 text-xs text-gray-700 outline-none focus:border-blue-500 sm:min-h-[82px] sm:rounded-lg sm:px-4 sm:py-2.5 sm:text-sm"
-                />
+                    value={description}
+                    placeholder=""
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={3}
+                    className={`min-h-[76px] w-full resize-none rounded-md border bg-white px-3 py-2 text-xs text-gray-700 outline-none sm:min-h-[82px] sm:rounded-lg sm:px-4 sm:py-2.5 sm:text-sm ${
+                      errors.description
+                        ? "border-red-400 focus:border-red-500"
+                        : "border-gray-200 focus:border-blue-500"
+                    }`}
+                  />
+                  {errors.description && (
+                    <p className="mt-1.5 text-xs font-medium text-red-500">
+                      {errors.description}
+                    </p>
+                  )}
               </FormField>
 
               {/* Company Type */}
@@ -163,6 +228,7 @@ if (showConfirm) {
                 <BusinessAddress
                   address={address}
                   setAddress={setAddress}
+                  errors={errors}
                 />
               </FormField>
 
