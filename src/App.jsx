@@ -80,8 +80,12 @@ const handleSubmit = () => {
 if (submitted) {
   return (
     <div className="min-h-screen bg-[#f8fafc]">
-      <Header 
-      onBack={() => window.location.href = "/"}/>
+      <Header
+        onBack={() => {
+          setSubmitted(false);
+          setCurrentStep(2);
+        }}
+      />
       <Success
         onBack={() => {
           setSubmitted(false);
