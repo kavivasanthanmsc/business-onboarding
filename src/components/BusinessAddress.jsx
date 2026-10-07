@@ -246,7 +246,7 @@ function BusinessAddress({ address, setAddress, errors }) {
               setCountryOpen(false);
               setStateOpen(false);
             }}
-            className={`h-[0px] w-full min-w-0 truncate overflow-hidden rounded-md border bg-white px-3 text-left text-xs text-gray-700 outline-none disabled:bg-gray-100 disabled:text-gray-400 sm:h-[42px] sm:rounded-lg sm:px-3 sm:text-sm ${
+            className={`h-[40px] w-full min-w-0 truncate overflow-hidden rounded-md border bg-white px-3 text-left text-xs text-gray-700 outline-none disabled:bg-gray-100 disabled:text-gray-400 sm:h-[42px] sm:rounded-lg sm:px-3 sm:text-sm ${
               errors.city
                 ? "border-red-400 focus:border-red-500"
                 : "border-gray-200 focus:border-blue-500"
