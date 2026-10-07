@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Country, State } from "country-state-city";
+import { Country, State, City } from "country-state-city";
 
 function BusinessAddress({ address, setAddress, errors }) {
   const [countryOpen, setCountryOpen] = useState(false);
@@ -7,6 +7,9 @@ function BusinessAddress({ address, setAddress, errors }) {
 
   const [stateOpen, setStateOpen] = useState(false);
   const [stateSearch, setStateSearch] = useState("");
+
+  const [cityOpen, setCityOpen] = useState(false);
+  const [citySearch, setCitySearch] = useState("");
 
   const updateField = (field, value) => {
     setAddress((previous) => ({
@@ -33,6 +36,17 @@ function BusinessAddress({ address, setAddress, errors }) {
     state.name.toLowerCase().includes(stateSearch.toLowerCase())
   );
 
+  // Cities based on selected country + state
+  const cities =
+    address.country && address.state
+      ? City.getCitiesOfState(address.country, address.state)
+      : [];
+
+  // Search city
+  const filteredCities = cities.filter((city) =>
+    city.name.toLowerCase().includes(citySearch.toLowerCase())
+  );
+
   return (
     <div className="space-y-2 sm:space-y-2.5">
 
@@ -43,6 +57,7 @@ function BusinessAddress({ address, setAddress, errors }) {
           onClick={() => {
             setCountryOpen(!countryOpen);
             setStateOpen(false);
+            setCityOpen(false);
           }}
           className={`h-[40px] w-full rounded-md border bg-white px-3 text-left text-xs text-gray-700 outline-none sm:h-[42px] sm:rounded-lg sm:px-4 sm:text-sm ${
             errors.country
@@ -86,12 +101,16 @@ function BusinessAddress({ address, setAddress, errors }) {
                     onClick={() => {
                       updateField("country", country.isoCode);
                       updateField("state", "");
+                      updateField("city", "");
 
                       setCountryOpen(false);
                       setCountrySearch("");
 
                       setStateOpen(false);
                       setStateSearch("");
+
+                      setCityOpen(false);
+                      setCitySearch("");
                     }}
                     className="block w-full px-3 py-2 text-left text-xs hover:bg-gray-100 sm:px-4 sm:text-sm"
                   >
@@ -140,26 +159,6 @@ function BusinessAddress({ address, setAddress, errors }) {
 
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_95px_95px]">
 
-        {/* ================= CITY ================= */}
-        <div>
-          <input
-            type="text"
-            placeholder="City"
-            value={address.city}
-            onChange={(e) => updateField("city", e.target.value)}
-            className={`h-[40px] w-full rounded-md border bg-white px-3 text-xs text-gray-700 outline-none sm:h-[42px] sm:rounded-lg sm:px-3 sm:text-sm ${
-              errors.city
-                ? "border-red-400 focus:border-red-500"
-                : "border-gray-200 focus:border-blue-500"
-            }`}
-          />
-
-          {errors.city && (
-            <p className="mt-1 text-xs font-medium text-red-500">
-              {errors.city}
-            </p>
-          )}
-        </div>
 
         {/* ================= STATE ================= */}
         <div className="relative">
@@ -169,6 +168,7 @@ function BusinessAddress({ address, setAddress, errors }) {
             onClick={() => {
               setStateOpen(!stateOpen);
               setCountryOpen(false);
+              setCityOpen(false);
             }}
             className={`h-[40px] w-full min-w-0 truncate overflow-hidden rounded-md border bg-white px-2 text-left text-xs text-gray-700 outline-none disabled:bg-gray-100 disabled:text-gray-400 sm:h-[42px] sm:rounded-lg sm:px-3 sm:text-sm ${
               errors.state
@@ -203,7 +203,7 @@ function BusinessAddress({ address, setAddress, errors }) {
               />
 
               {/* State List */}
-              <div className="max-h-48 overflow-x-auto overflow-y-auto">
+              <div className="max-h-48 overflow-x-hidden overflow-y-auto">
                 {filteredStates.length > 0 ? (
                   filteredStates.map((state) => (
                     <button
@@ -211,8 +211,13 @@ function BusinessAddress({ address, setAddress, errors }) {
                       type="button"
                       onClick={() => {
                         updateField("state", state.isoCode);
+                        updateField("city", "");
+
                         setStateOpen(false);
                         setStateSearch("");
+
+                        setCityOpen(false);
+                        setCitySearch("");
                       }}
                       className="block w-full px-2 py-2 text-left text-xs hover:bg-gray-100 sm:px-3 sm:text-sm"
                     >
@@ -228,6 +233,75 @@ function BusinessAddress({ address, setAddress, errors }) {
             </div>
           )}
         </div>
+
+
+
+        {/* ================= CITY ================= */}
+        <div className="relative">
+          <button
+            type="button"
+            disabled={!address.state}
+            onClick={() => {
+              setCityOpen(!cityOpen);
+              setCountryOpen(false);
+              setStateOpen(false);
+            }}
+            className={`h-[0px] w-full min-w-0 truncate overflow-hidden rounded-md border bg-white px-3 text-left text-xs text-gray-700 outline-none disabled:bg-gray-100 disabled:text-gray-400 sm:h-[42px] sm:rounded-lg sm:px-3 sm:text-sm ${
+              errors.city
+                ? "border-red-400 focus:border-red-500"
+                : "border-gray-200 focus:border-blue-500"
+            }`}
+          >
+            {address.city || "City"}
+          </button>
+
+          {errors.city && (
+            <p className="mt-1 text-xs font-medium text-red-500">
+              {errors.city}
+            </p>
+          )}
+
+          {/* City Search Dropdown */}
+          {cityOpen && address.state && (
+            <div className="absolute bottom-full z-50 mb-1 w-full min-w-[220px] rounded-md border border-gray-200 bg-white shadow-lg">
+
+              {/* City Search */}
+              <input
+                type="text"
+                placeholder="Search city..."
+                value={citySearch}
+                onChange={(e) => setCitySearch(e.target.value)}
+                className="w-full border-b border-gray-200 px-3 py-2 text-xs outline-none sm:text-sm"
+                autoFocus
+              />
+
+              {/* City List */}
+              <div className="max-h-48 overflow-y-auto">
+                {filteredCities.length > 0 ? (
+                  filteredCities.map((city, index) => (
+                    <button
+                      key={`${city.name}-${index}`}
+                      type="button"
+                      onClick={() => {
+                        updateField("city", city.name);
+                        setCityOpen(false);
+                        setCitySearch("");
+                      }}
+                      className="block w-full truncate px-3 py-2 text-left text-xs hover:bg-gray-100 sm:text-sm"
+                    >
+                      {city.name}
+                    </button>
+                  ))
+                ) : (
+                  <p className="px-3 py-2 text-xs text-gray-500">
+                    No city found
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
 
         {/* ================= ZIPCODE ================= */}
         <div>
