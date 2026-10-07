@@ -1,6 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 
-function Header({onBack}) {
+function Header({ onBack }) {
   return (
     <header className="h-[52px] border-b border-gray-200 bg-white">
       <div className="mx-auto flex h-full max-w-[1400px] items-center px-4 sm:px-6 lg:px-10">
@@ -16,4 +16,5 @@ function Header({onBack}) {
     </header>
   );
 }
+
 export default Header;
